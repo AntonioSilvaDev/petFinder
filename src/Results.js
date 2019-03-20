@@ -14,7 +14,8 @@ class Results extends React.Component {
     super(props);
 
     this.state = {
-      pets: []
+      pets: [],
+      loading: true
     };
     //constructors are run first, then component mounts
   }
@@ -22,7 +23,7 @@ class Results extends React.Component {
   componentDidMount() {
     //lifecycle method
     petfinder.pet
-      .find({ output: "full", location: "San Diego, CA" })
+      .find({ location: "San Diego, CA", output: "full" })
       .then(data => {
         let pets;
 
@@ -35,15 +36,20 @@ class Results extends React.Component {
         } else {
           pets = [];
         }
+        console.log(pets);
 
         this.setState({
           //shallow merge
-          pets
+          pets,
+          loading: false
         });
       });
   }
 
   render() {
+    if (this.state.loading) {
+      return <h1>Loading.....</h1>;
+    }
     return (
       <div className="search">
         {this.state.pets.map(pet => {
