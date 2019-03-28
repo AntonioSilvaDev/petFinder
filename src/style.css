@@ -4,7 +4,7 @@
 }
 
 body {
-  background-color: #ad343e;
+  background-color: #917b71;
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -65,11 +65,20 @@ body {
 }
 
 header a {
-  color: #f2af29;
+  color: #96db55;
   font-size: 50px;
   text-decoration: none;
   font-weight: bold;
   display: block;
+  transition: font-size 1s;
+}
+header a:hover {
+  color: red;
+  font-size: 100px;
+}
+
+select:disabled {
+  background-color: rgb(161, 157, 157);
 }
 
 header {

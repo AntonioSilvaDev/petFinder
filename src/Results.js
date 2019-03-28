@@ -1,15 +1,17 @@
 import React from "react";
 import pf from "petfinder-client";
+import { Consumer } from "./SearchContext";
 import Pet from "./Pet";
+import SearchBox from "./SearchBox";
 
 const petfinder = pf({
   //API(client) Library that btholt created for this workshop
   secret: process.env.API_SECRET,
-  key: process.env.API_KEY
+  key: process.env.API_KEY,
+  version: 2
 });
 
 class Results extends React.Component {
-  //class component
   constructor(props) {
     super(props);
 
@@ -17,13 +19,19 @@ class Results extends React.Component {
       pets: [],
       loading: true
     };
-    //constructors are run first, then component mounts
+  }
+  componentDidMount() {
+    this.search();
   }
 
-  componentDidMount() {
-    //lifecycle method
+  search = () => {
     petfinder.pet
-      .find({ location: "San Diego, CA", output: "full" })
+      .find({
+        output: "full",
+        location: this.props.searchParams.location,
+        animal: this.props.searchParams.animal,
+        breed: this.props.searchParams.breed
+      })
       .then(data => {
         let pets;
 
@@ -36,7 +44,6 @@ class Results extends React.Component {
         } else {
           pets = [];
         }
-        console.log(pets);
 
         this.setState({
           //shallow merge
@@ -44,7 +51,7 @@ class Results extends React.Component {
           loading: false
         });
       });
-  }
+  };
 
   render() {
     if (this.state.loading) {
@@ -52,6 +59,7 @@ class Results extends React.Component {
     }
     return (
       <div className="search">
+        <SearchBox search={this.search} />
         {this.state.pets.map(pet => {
           let breed;
 
@@ -79,4 +87,10 @@ class Results extends React.Component {
   }
 }
 
-export default Results;
+export default function ResultsWithContext(props) {
+  return (
+    <Consumer>
+      {context => <Results {...props} searchParams={context} />}
+    </Consumer>
+  );
+}

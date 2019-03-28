@@ -1,6 +1,8 @@
 import React from "react";
 import pf from "petfinder-client";
 import { navigate } from "@reach/router";
+import Carousel from "./Carousel";
+import Modal from "./Modal";
 
 const petfinder = pf({
   key: process.env.API_KEY,
@@ -9,24 +11,27 @@ const petfinder = pf({
 
 class Details extends React.Component {
   state = {
-    loading: true
-  }; //now you don't
+    loading: true,
+    showModal: false
+  }; //now you don't need a constructor since we are using class properties
 
+  toggleModal = () => this.setState({ showModal: !this.state.showModal });
   componentDidMount() {
     petfinder.pet
       .get({
-        output: "full",
-        id: this.props.id
+        id: this.props.id,
+        output: "basic"
       })
       .then(data => {
         const pet = data.petfinder.pet;
+        console.log(pet);
         let breed;
         if (Array.isArray(pet.breeds.breed)) {
           breed = pet.breeds.breed.join(", ");
         } else {
           breed = pet.breeds.breed;
         }
-        console.log(pet.description);
+        console.log(data);
 
         this.setState({
           name: pet.name,
@@ -44,14 +49,25 @@ class Details extends React.Component {
         navigate("/");
       });
   }
-
   render() {
     if (this.state.loading) {
       return <h1>Loading.....</h1>;
     }
-    const { animal, name, breed, description, location, id } = this.state;
+    const {
+      animal,
+      name,
+      breed,
+      description,
+      location,
+      id,
+      media,
+      showModal
+    } = this.state;
+
+    console.log(description);
     return (
       <div className="details">
+        <Carousel media={media} />
         <div>
           <h1>
             {name} - {id}
@@ -59,7 +75,17 @@ class Details extends React.Component {
           <h2>
             {animal} - {breed} - {location}
           </h2>
+          <button onClick={this.toggleModal}>Adopt {name}!</button>
           <p>{description ? description : "No description available"}</p>
+          {showModal ? (
+            <Modal>
+              <h1>Would you like to adopt {name}?</h1>
+              <div className="buttons">
+                <button onClick={this.toggleModal}>YES</button>
+                <button onClick={this.toggleModal}>Hell YES</button>
+              </div>
+            </Modal>
+          ) : null}
         </div>
       </div>
     );
